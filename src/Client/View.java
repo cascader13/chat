@@ -15,7 +15,7 @@ public class View {
 
     private JPanel panel = new JPanel();
 
-    private JTextField textField = new JTextField(40);
+    private JTextField input = new JTextField(40);
 
     private JButton buttonConnectDisconnect = new JButton("Подключиться");
 
@@ -27,7 +27,7 @@ public class View {
         frame.add(new JScrollPane(messages), BorderLayout.CENTER);
         frame.add(new JScrollPane(users), BorderLayout.WEST);
 
-        panel.add(textField);
+        panel.add(input);
         panel.add(buttonConnectDisconnect);
         frame.add(panel, BorderLayout.SOUTH);
 
@@ -60,11 +60,11 @@ public class View {
             }
         });
 
-        textField.addActionListener(new ActionListener() {
+        input.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                client.sendMessageOnServer(textField.getText());
-                textField.setText("");
+                client.sendMessageOnServer(input.getText());
+                input.setText("");
             }
         });
     }

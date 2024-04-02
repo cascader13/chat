@@ -1,6 +1,8 @@
 package Server;
 
 import Connection.*;
+import Database.Database;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ public class Server {
 
     private ServerSocket serverSocket;
 
+    private Database DB;
     private static View gui;
 
     private static Model model;
@@ -20,9 +23,11 @@ public class Server {
     protected void start(int port){
         try{
             serverSocket = new ServerSocket(port);
+            DB = new Database(port);
             isStart = true;
             gui.refreshDialogWindowServer("Сервер запущен.\n");
         }catch (Exception e){
+            e.printStackTrace();
             gui.refreshDialogWindowServer("Не удалось запустить сервер.\n");
         }
     }
@@ -79,6 +84,20 @@ public class Server {
             }
         }
     }
+
+    public void console(Console_command consoleCommand, String message) {
+        switch (consoleCommand){
+            case SEND:
+                gui.refreshDialogWindowServer("/send\n" + message);
+                sendMessageAllUsers(new Message(MessageType.TEXT_MESSAGE, "Admin:" + message));
+                break;
+            case HElP:
+                gui.refreshDialogWindowServer("/help\nits work!\n");
+                break;
+
+        }
+    }
+
     private class ServerThread extends Thread {
         private Socket socket;
 
@@ -141,7 +160,6 @@ public class Server {
                 }
             }
         }
-
         @Override
         public void run() {
             gui.refreshDialogWindowServer(String.format("Подключился новый пользователь с удаленным сокетом - %s.\n", socket.getRemoteSocketAddress()));

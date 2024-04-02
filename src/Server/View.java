@@ -6,14 +6,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Objects;
 
 
 public class View {
     private JFrame frame = new JFrame("Запуск сервера");
     private JTextArea dialogWindow = new JTextArea(10, 40);
-    private JButton buttonStartServer = new JButton("Запустить сервер");
-    private JButton buttonStopServer = new JButton("Остановить сервер");
+    private JButton buttonStartStopServer = new JButton("Запустить сервер");
     private JPanel panelButtons = new JPanel();
+
+    private JTextField Input = new JTextField(40);
     private final Server server;
 
     public View(Server server) {
@@ -25,8 +27,8 @@ public class View {
         dialogWindow.setEditable(false);
         dialogWindow.setLineWrap(true);  //автоматический перенос строки в JTextArea
         frame.add(new JScrollPane(dialogWindow), BorderLayout.CENTER);
-        panelButtons.add(buttonStartServer);
-        panelButtons.add(buttonStopServer);
+        panelButtons.add(Input);
+        panelButtons.add(buttonStartStopServer);
         frame.add(panelButtons, BorderLayout.SOUTH);
         frame.pack();
         frame.setLocationRelativeTo(null); // при запуске отображает окно по центру экрана
@@ -41,20 +43,38 @@ public class View {
         });
         frame.setVisible(true);
 
-        buttonStartServer.addActionListener(new ActionListener() {
+        buttonStartStopServer.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int port = getPortFromOptionPane();
-                server.start(port);
+                if (Objects.equals(buttonStartStopServer.getText(), "Запустить сервер")) {
+                    int port = getPortFromOptionPane();
+                    server.start(port);
+                    buttonStartStopServer.setText("Остановить сервер");
+                } else {
+                    server.stop();
+                    buttonStartStopServer.setText("Запустить сервер");
+                }
             }
         });
-        buttonStopServer.addActionListener(new ActionListener() {
+        Input.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                server.stop();
+                String comm = Input.getText().split(" ")[0];
+
+                switch (comm){
+                    case ("/help"):
+                        server.console(Console_command.HElP, "");
+                        break;
+                    case ("/send"):
+                        if (Input.getText().split(" ").length != 1){
+                        server.console(Console_command.SEND, Input.getText().substring(5));
+                        break;
+                }
+                }
             }
-        });
-    }
+            });
+        }
+
 
     //метод который добавляет в текстовое окно новое сообщение
     public void refreshDialogWindowServer(String serviceMessage) {
